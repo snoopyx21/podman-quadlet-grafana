@@ -1,0 +1,11 @@
+[Unit]
+Description=Grafana (Kube-Play via Quadlet)
+
+[Kube]
+Yaml={{ grafana_pod_name }}.yaml
+
+[Service]
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

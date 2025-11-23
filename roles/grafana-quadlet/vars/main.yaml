@@ -1,0 +1,21 @@
+---
+# Rootless
+podman_user: constantin
+
+# Nom du pod
+grafana_pod_name: grafana
+
+# Port d'écoute sur l'hôte
+grafana_port: 3000
+
+# Chemin où tu veux stocker les données persistantes
+grafana_data_path: /hdd/data
+
+# Fuseau horaire
+grafana_timezone: Europe/Luxembourg
+
+# Image 
+grafana_image: "docker.io/grafana/grafana"
+
+# Directory
+quadlet_dir: "$HOME/.config/containers/systemd"

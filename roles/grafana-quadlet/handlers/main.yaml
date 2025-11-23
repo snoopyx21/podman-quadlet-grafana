@@ -1,0 +1,41 @@
+---
+# Handler : stop Grafana podman kube service
+- name: Stop Grafana Service
+  systemd:
+    name: "{{ grafana_pod_name }}.service"
+    state: stopped
+    scope: user
+  listen: Stop Grafana
+  ignore_errors: true
+
+- name: Reload Quadlet
+  shell: |
+    systemctl --user daemon-reload
+
+# Handler : start Grafana podman kube service
+- name: Start Grafana Service
+  systemd:
+    name: "{{ grafana_pod_name }}.service"
+    state: started
+    scope: user
+  listen: Start Grafana
+  ignore_errors: true
+
+- name: Open Grafana port
+  firewalld:
+    port: 3000/tcp
+    permanent: true
+    state: enabled
+  become: true
+
+- name: Close Grafana port
+  firewalld:
+    port: 3000/tcp
+    permanent: true
+    state: disabled
+  become: true
+
+- name: Reload firewalld
+  ansible.builtin.service:
+    name: firewalld
+    state: reloaded

@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: grafana
+  labels:
+    io.containers.autoupdate: "registry"
+spec:
+  containers:
+    - name: grafana
+      image: {{ grafana_image }}
+      ports:
+        - containerPort: {{ grafana_port }}
+          hostPort: {{ grafana_port }}
+      volumeMounts:
+        - mountPath: {{ grafana_data_path }}
+          name: grafana-data
+      env:
+        - name: GF_SECURITY_ADMIN_USER
+          value: admin
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: changeme
+        - name: TZ
+          value: {{ grafana_timezone }}
+  volumes:
+    - name: grafana-data
+      persistentVolumeClaim:
+        claimName: grafana-data
+

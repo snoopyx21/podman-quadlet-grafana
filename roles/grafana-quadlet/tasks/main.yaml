@@ -1,0 +1,63 @@
+---
+- name: Install Podman and dependencies
+  tags: deploy
+  package:
+    name:
+      - podman
+      - slirp4netns
+      - fuse-overlayfs
+    state: present
+
+- name: Pull Grafana Docker image
+  tags: deploy
+  shell: 'podman pull {{ grafana_image }}'
+  register: grafana_pull
+  changed_when: "'Downloaded' in grafana_pull.stdout or 'Pull complete' in grafana_pull.stdout"
+  ignore_errors: false
+
+- name: Create persistent data directory
+  tags: deploy
+  file:
+    path: "{{ grafana_data_path }}"
+    state: directory
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: "0755"
+
+- name: Deploy Kubernetes manifest for Grafana
+  tags: deploy
+  template:
+    src: grafana.yaml.j2
+    dest: "{{ quadlet_dir }}/{{ grafana_pod_name }}.yaml"
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: "0644"
+
+- name: Deploy Quadlet kube wrapper
+  tags: deploy
+  template:
+    src: grafana.kube.j2
+    dest: "{{ quadlet_dir }}/{{ grafana_pod_name }}.kube"
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: "0644"
+  notify:
+    - Reload Quadlet
+    - Start Grafana
+    - Open Grafana port
+    - Reload firewalld
+
+
+- name: Remove YAML + Kube + related files
+  tags: cleanup
+  file:
+    path: "{{ quadlet_dir }}/{{ item }}"
+    state: absent
+  loop:
+    - "{{ grafana_pod_name }}.yaml"
+    - "{{ grafana_pod_name }}.kube"
+  notify: 
+    - Stop Grafana
+    - Reload Quadlet
+    - Close Grafana port
+    - Reload firewalld
