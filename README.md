@@ -7,11 +7,11 @@ Deploy grafana with Podman Quadlet
 
 To start Grafana on your device :
 ```bash
-ansiible-playbook grafana.yaml --tags deploy
+ansiible-playbook grafana.yaml --tags deploy --ask-become-pass
 ```
 To stop this installation of Grafana on your device :
 ```bash
-ansible-playbook grafana.yaml --tags cleanup
+ansible-playbook grafana.yaml --tags cleanup --ask-become-pass
 ```
 
 ## License

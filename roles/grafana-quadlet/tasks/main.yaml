@@ -56,7 +56,9 @@
   loop:
     - "{{ grafana_pod_name }}.yaml"
     - "{{ grafana_pod_name }}.kube"
-  notify: 
+  notify:
+    - Stop Grafana Pod
+    - Remove Grafana Pod 
     - Stop Grafana
     - Reload Quadlet
     - Close Grafana port

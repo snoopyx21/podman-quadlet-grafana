@@ -1,5 +1,10 @@
 ---
-# Handler : stop Grafana podman kube service
+- name: Stop Grafana Pod
+  command: podman pod stop "{{ grafana_pod_name }}"
+
+- name: Remove Grafana Pod
+  command: podman pod rm "{{ grafana_pod_name }}"
+
 - name: Stop Grafana Service
   systemd:
     name: "{{ grafana_pod_name }}.service"
@@ -9,10 +14,13 @@
   ignore_errors: true
 
 - name: Reload Quadlet
-  shell: |
-    systemctl --user daemon-reload
+  systemd:
+    daemon_reexec: true
+    scope: user
 
-# Handler : start Grafana podman kube service
+- name: Reset failed services
+  command: systemctl --user reset-failed  
+
 - name: Start Grafana Service
   systemd:
     name: "{{ grafana_pod_name }}.service"
